@@ -1,3 +1,4 @@
+
 from google.cloud import storage, bigquery
 import pandas as pd
 from pyspark.sql import SparkSession
@@ -12,21 +13,21 @@ bq_client = bigquery.Client()
 spark = SparkSession.builder.appName("HospitalAMySQLToLanding").getOrCreate()
 
 # Google Cloud Storage (GCS) Configuration
-GCS_BUCKET = "healthcare-bucket-22032025"
+GCS_BUCKET = "healthcare-bucket202507723"
 HOSPITAL_NAME = "hospital-a"
 LANDING_PATH = f"gs://{GCS_BUCKET}/landing/{HOSPITAL_NAME}/"
 ARCHIVE_PATH = f"gs://{GCS_BUCKET}/landing/{HOSPITAL_NAME}/archive/"
 CONFIG_FILE_PATH = f"gs://{GCS_BUCKET}/configs/load_config.csv"
 
 # BigQuery Configuration
-BQ_PROJECT = "avd-databricks-demo"
+BQ_PROJECT = "healthcare-466804"
 BQ_AUDIT_TABLE = f"{BQ_PROJECT}.temp_dataset.audit_log"
 BQ_LOG_TABLE = f"{BQ_PROJECT}.temp_dataset.pipeline_logs"
 BQ_TEMP_PATH = f"{GCS_BUCKET}/temp/"  
 
 # MySQL Configuration
 MYSQL_CONFIG = {
-    "url": "jdbc:mysql://34.132.104.87:3306/hospital_a_db?useSSL=false&allowPublicKeyRetrieval=true",
+    "url": "jdbc:mysql://34.134.235.57:3306/hospital_a_db?useSSL=false&allowPublicKeyRetrieval=true",
     "driver": "com.mysql.cj.jdbc.Driver",
     "user": "myuser",
     "password": "mypass"
@@ -76,7 +77,7 @@ def save_logs_to_bigquery():
     
 ##------------------------------------------------------------------------------------------------------------------##
 
-# Function to Move Existing Files to Archive
+    # Function to Move Existing Files to Archive
 def move_existing_files_to_archive(table):
     blobs = list(storage_client.bucket(GCS_BUCKET).list_blobs(prefix=f"landing/{HOSPITAL_NAME}/{table}/"))
     existing_files = [blob.name for blob in blobs if blob.name.endswith(".json")]
@@ -171,7 +172,7 @@ def read_config_file():
     return df
 
 # read config file
-config_df = read_config_file()
+config_df = read_config_file() 
 
 for row in config_df.collect():
     if row["is_active"] == '1' and row["datasource"] == "hospital_a_db": 

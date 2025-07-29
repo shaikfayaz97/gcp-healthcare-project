@@ -1,14 +1,14 @@
 from pyspark.sql import SparkSession
-
 # Create Spark session
 spark = SparkSession.builder \
                     .appName("CPT Codes Ingestion") \
                     .getOrCreate()
 
+
 # configure variables
-BUCKET_NAME = "healthcare-bucket-22032025"
+BUCKET_NAME = "healthcare-bucket202507723"
 CPT_BUCKET_PATH = f"gs://{BUCKET_NAME}/landing/cptcodes/*.csv"
-BQ_TABLE = "avd-databricks-demo.bronze_dataset.cpt_codes"
+BQ_TABLE = "healthcare-466804.bronze_dataset.cpt_codes"
 TEMP_GCS_BUCKET = f"{BUCKET_NAME}/temp/"
 
 # read from cpt
@@ -26,3 +26,4 @@ for col in cptcodes_df.columns:
             .option("temporaryGcsBucket", TEMP_GCS_BUCKET)
             .mode("overwrite")
             .save())
+
