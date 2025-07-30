@@ -77,7 +77,7 @@ def save_logs_to_bigquery():
 ##------------------------------------------------------------------------------------------------------------------##
 
 # Function to Move Existing Files to Archive
-def move_existing_files_to_archive(table):
+'''def move_existing_files_to_archive(table):
     blobs = list(storage_client.bucket(GCS_BUCKET).list_blobs(prefix=f"landing/{HOSPITAL_NAME}/{table}/"))
     existing_files = [blob.name for blob in blobs if blob.name.endswith(".json")]
 
@@ -100,7 +100,7 @@ def move_existing_files_to_archive(table):
         storage_client.bucket(GCS_BUCKET).copy_blob(source_blob, storage_client.bucket(GCS_BUCKET), destination_blob.name)
         source_blob.delete()
 
-        log_event("INFO", f"Moved {file} to {archive_path}", table=table)
+        log_event("INFO", f"Moved {file} to {archive_path}", table=table)'''
         
 ##------------------------------------------------------------------------------------------------------------------##
 
