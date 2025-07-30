@@ -148,7 +148,5 @@ with DAG(
     )
 
     # Task dependencies
-    start_cluster >> [pyspark_task_1, pyspark_task_2]
-    [pyspark_task_1, pyspark_task_2] >> [pyspark_task_3, pyspark_task_4]
-    [pyspark_task_3, pyspark_task_4] >> [archive_task_ha, archive_task_hb]
-    [archive_task_ha, archive_task_hb] >> stop_cluster
+    start_cluster >> pyspark_task_1 >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4 >> archive_task_ha >> archive_task_hb >> stop_cluster
+   
