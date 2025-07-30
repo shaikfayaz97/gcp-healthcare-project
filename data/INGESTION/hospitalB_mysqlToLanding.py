@@ -135,6 +135,11 @@ def extract_and_save_to_landing(table, load_type, watermark_col):
                 .option("driver", MYSQL_CONFIG["driver"])
                 .option("dbtable", query)
                 .load())
+        record_count = df.count()
+
+        if record_count == 0:
+            log_event("INFO", f"No new records found for table {table}. Skipping file write and archive.", table=table)
+            return
 
         log_event("SUCCESS", f"✅ Successfully extracted data from {table}", table=table)
 
@@ -176,7 +181,7 @@ config_df = read_config_file()
 for row in config_df.collect():
     if row["is_active"] == '1' and row["datasource"] == "hospital_b_db": 
         db, src, table, load_type, watermark, _, targetpath = row
-        move_existing_files_to_archive(table)
+        #move_existing_files_to_archive(table)
         extract_and_save_to_landing(table, load_type, watermark)
         
 save_logs_to_gcs()

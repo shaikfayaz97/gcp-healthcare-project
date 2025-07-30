@@ -13,7 +13,7 @@ bq_client = bigquery.Client()
 spark = SparkSession.builder.appName("HospitalAMySQLToLanding").getOrCreate()
 
 # Google Cloud Storage (GCS) Configuration
-GCS_BUCKET = "healthcare-bucket202507723"
+GCS_BUCKET = "healthcare-bucket202507723"   
 HOSPITAL_NAME = "hospital-a"
 LANDING_PATH = f"gs://{GCS_BUCKET}/landing/{HOSPITAL_NAME}/"
 ARCHIVE_PATH = f"gs://{GCS_BUCKET}/landing/{HOSPITAL_NAME}/archive/"
@@ -77,8 +77,8 @@ def save_logs_to_bigquery():
     
 ##------------------------------------------------------------------------------------------------------------------##
 
-    # Function to Move Existing Files to Archive
-def move_existing_files_to_archive(table):
+    ### Function to Move Existing Files to Archive
+"""def move_existing_files_to_archive(table):
     blobs = list(storage_client.bucket(GCS_BUCKET).list_blobs(prefix=f"landing/{HOSPITAL_NAME}/{table}/"))
     existing_files = [blob.name for blob in blobs if blob.name.endswith(".json")]
 
@@ -101,8 +101,7 @@ def move_existing_files_to_archive(table):
         storage_client.bucket(GCS_BUCKET).copy_blob(source_blob, storage_client.bucket(GCS_BUCKET), destination_blob.name)
         source_blob.delete()
 
-        log_event("INFO", f"Moved {file} to {archive_path}", table=table)
-        
+        log_event("INFO", f"Moved {file} to {archive_path}", table=table) """        
 ##------------------------------------------------------------------------------------------------------------------##
 
 # Function to Get Latest Watermark from BigQuery Audit Table
@@ -136,8 +135,12 @@ def extract_and_save_to_landing(table, load_type, watermark_col):
                 .option("driver", MYSQL_CONFIG["driver"])
                 .option("dbtable", query)
                 .load())
+        
+        record_count = df.count()
 
-        log_event("SUCCESS", f"✅ Successfully extracted data from {table}", table=table)
+        if record_count == 0:
+            log_event("INFO", f"No new records found for table {table}. Skipping file write and archive.", table=table)
+            return
 
         today = datetime.datetime.today().strftime('%d%m%Y')
         JSON_FILE_PATH = f"landing/{HOSPITAL_NAME}/{table}/{table}_{today}.json"
@@ -172,13 +175,13 @@ def read_config_file():
     return df
 
 # read config file
-config_df = read_config_file() 
+config_df = read_config_file()
 
 for row in config_df.collect():
     if row["is_active"] == '1' and row["datasource"] == "hospital_a_db": 
         db, src, table, load_type, watermark, _, targetpath = row
-        move_existing_files_to_archive(table)
+        # move_existing_files_to_archive(table)  # ❌ Do not archive here anymore
         extract_and_save_to_landing(table, load_type, watermark)
-        
+
 save_logs_to_gcs()
 save_logs_to_bigquery()
