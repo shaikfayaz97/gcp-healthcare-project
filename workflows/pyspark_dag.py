@@ -124,7 +124,7 @@ with DAG(
         op_kwargs={
             'hospital': 'hospital-a',
             'tables': ['encounters', 'patients', 'departments', 'providers', 'transactions']
-        },trigger_rule=TriggerRule.ALL_SUCCESS
+        }
     )
     archive_task_ha.trigger_rule = TriggerRule.ALL_SUCCESS
 
@@ -135,7 +135,7 @@ with DAG(
         op_kwargs={
             'hospital': 'hospital-b',
             'tables': ['encounters', 'patients', 'departments', 'providers', 'transactions']
-        },trigger_rule=TriggerRule.ALL_SUCCESS
+        }
     )
     archive_task_hb.trigger_rule = TriggerRule.ALL_SUCCESS
 
